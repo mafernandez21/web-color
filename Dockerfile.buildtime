@@ -1,0 +1,19 @@
+# web-color — configuración en BUILD (el ANTI-PATRÓN contra el que argumenta el curso).
+# El color queda horneado en index.html durante el build: hace falta UNA IMAGEN POR
+# AMBIENTE. Se usa en la semana 2 para que la diferencia se vea antes de corregirla.
+FROM nginxinc/nginx-unprivileged:1.27-alpine
+
+ARG APP_VERSION=v1
+ARG APP_NAME=web-color
+ARG APP_COLOR=firebrick
+
+COPY html/index.html.template /tmp/index.html.template
+
+USER root
+RUN APP_NAME="${APP_NAME}" APP_VERSION="${APP_VERSION}" APP_COLOR="${APP_COLOR}" \
+    envsubst '${APP_NAME} ${APP_VERSION} ${APP_COLOR}' \
+      < /tmp/index.html.template > /usr/share/nginx/html/index.html \
+ && rm /tmp/index.html.template
+USER nginx
+
+EXPOSE 8080
